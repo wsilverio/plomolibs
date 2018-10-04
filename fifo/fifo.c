@@ -6,7 +6,7 @@
 *  | I rm -rf fifo I |      @author Wendeu
 *  | I             I |      @date   Oct 2018
 *  | I_____________I |      @brief  Implementação simples para uma FIFO ("First in, first out")
-*  !_________________!              de até 256* posições, com dados do tipo "uint8_t".
+*  !_________________!              de até 254 posições, com dados do tipo "uint8_t".
 *     ._[_______]_.
 * .___|___________|___.
 * |::: ____           |
@@ -57,7 +57,7 @@ uint8_t fifo_data_length(FIFO *fifo)
         return (fifo->writeIndex - fifo->readIndex);
     }
     // else
-    return (uint8_t)((fifo->size - 1) - fifo->readIndex + fifo->writeIndex);
+    return (uint8_t)((fifo->size) - fifo->readIndex + fifo->writeIndex);
 }
 
 /**

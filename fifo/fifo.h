@@ -1,16 +1,16 @@
 /**
 *  ._________________.
-*  | _______________ |
-*  | I             I |
-*  | I cd plomo/   I |      @file   fifo.h
-*  | I rm -rf fifo I |      @author Wendeu
-*  | I             I |      @date   Oct 2018
-*  | I_____________I |      @brief  Implementação simples para uma FIFO ("First in, first out")
-*  !_________________!              de até 255 posições, com dados do tipo "uint8_t".
-*     ._[_______]_.
-* .___|___________|___.
-* |::: ____           |
-* |    ~~~~ [CD-DVD]  |
+*  | _______________ |      @file   fifo.h
+*  | I             I |      @author Wendeu
+*  | I cd plomo/   I |      @date   Oct 2018
+*  | I rm -rf fifo I |      @brief  Implementação simples para uma FIFO ("First in, first out")
+*  | I             I |              de até 254 posições, com dados do tipo "uint8_t".
+*  | I_____________I |
+*  !_________________!      Como usar:
+*     ._[_______]_.             Declarar um objeto do tipo FIFO. Ter em mente que seu tamanho será 1 unidade menor que o do seu buffer;
+* .___|___________|___.         Declarar o buffer: vetor de bytes (uint8_t) com tamanho entre 2 e 255 (inclusivos);
+* |::: ____           |         Inicializar a fifo e assimilá-la a seu buffer através da macro INIT_FIFO;
+* |    ~~~~ [CD-DVD]  |         Manipular a fifo através das funções fifo_push() e fifo_pull().
 * !___________________!
 */
 
@@ -49,15 +49,15 @@ typedef struct tagFIFO
 *  \def INIT_FIFO(fifo, buffer)
 *   @brief      Inicializa e assimila o objeto \a fifo ao array externo \a buffer.
 *   @param      fifo objeto FIFO.
-*   @param      buffer array externo (uint8_t[]).
-*   @returns    None.
+*   @param      extBuffer array externo (uint8_t[]) com sizeof() entre 2 e 255.
 */
-#define INIT_FIFO(fifo, buffer) \
+#define INIT_FIFO(fifo, extBuffer) \
     do{ \
-    fifo.buffer = buffer; \
-    fifo.size = sizeof(buffer); \
+    fifo.buffer = extBuffer; \
+    fifo.size = sizeof(extBuffer); \
     fifo.readIndex = fifo.writeIndex = 0; \
     }while(0)
+
 /////////////////////////////////////////////////////////////////
 // protótipo das funções públicas
 /////////////////////////////////////////////////////////////////
