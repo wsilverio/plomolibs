@@ -33,5 +33,6 @@
 
 typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
 typedef enum {RESET = 0, SET = !RESET} FlagStatus;
+typedef enum {DISABLE = 0, ENABLE = !DISABLE} FunctionalState;
 
 #endif // PLOMOTYPES_H
