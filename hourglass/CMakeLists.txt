@@ -11,3 +11,5 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     target_compile_definitions(hourglass PUBLIC USE_FULL_ASSERT=0)
 endif ()
+
+TARGET_LINK_LIBRARIES( hourglass pthread rt)
