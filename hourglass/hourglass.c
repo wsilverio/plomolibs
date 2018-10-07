@@ -55,7 +55,7 @@ struct
 /////////////////////////////////////////////////////////////////
 // variáveis globais
 /////////////////////////////////////////////////////////////////
-
+pthread_mutex_t gMutex1 = PTHREAD_MUTEX_INITIALIZER;
 /////////////////////////////////////////////////////////////////
 // variáveis privadas do módulo
 /////////////////////////////////////////////////////////////////
@@ -65,9 +65,6 @@ bool mInit = false; /// Sinaliza que o módulo foi inicializado.
 /////////////////////////////////////////////////////////////////
 // macros
 /////////////////////////////////////////////////////////////////
-
-#define DISABLE_MASTER_INTERRUPT() do{  }while(0)
-#define ENABLE_MASTER_INTERRUPT() do{  }while(0)
 
 /** \def IS_VALID_ID(id)
  * @brief Verifica se o id é válido.
@@ -302,8 +299,6 @@ void hourglass_timertick(void)
 {
     assert_param(mInit);
 
-    // TODO: timer do módulo. hora que zerar, parte para o t...
-
     // Percorre todo o array.
     for (HOURGLASS_ID id = (HOURGLASS_ID)0; id < HOURGLASS_TOTAL_ID; ++id)
     {
@@ -317,7 +312,7 @@ void hourglass_timertick(void)
                 --mHOURGLASS[id].count;
 
                 // Verifica se o decremento gerou timeout.
-                if (mHOURGLASS[id].timedout == 0)
+                if (mHOURGLASS[id].count == 0)
                 {
                     // TIMEOUT.
                     ///////////

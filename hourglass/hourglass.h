@@ -29,6 +29,7 @@
 // bibliotecas
 /////////////////////////////////////////////////////////////////
 // nativas
+#include <pthread.h> /// exemplo
 
 // usuário
 #include "plomodefs.h"
@@ -36,7 +37,6 @@
 // definições
 /////////////////////////////////////////////////////////////////
 
-#define HOURGLASS_MASTER_TIMER_RELOAD_VALUE 0
 #define HOURGLASS_MASTER_TIMER_BASE_IN_MS 100
 
 /////////////////////////////////////////////////////////////////
@@ -49,11 +49,11 @@
  */
 typedef enum tagHOURGLASS_ID
 {
-    // IDENTIFICAÇÃO---------- | count | reload | modo      | param | func                | estado
-    HOURGLASS_ID__TIMER_A, /// | 5s    | ------ | one-shot  | id    | soft_timer_callback | run
-    HOURGLASS_ID__TIMER_B, /// | 2s    | 2s     | periódico | id    | soft_timer_callback | wait
-    HOURGLASS_ID__TIMER_C, /// | 1s    | 2,5s   | periódico | ----- | NULL                | run
-    HOURGLASS_ID__TIMER_D, /// | 0,5s  | ------ | one-shot  | id    | soft_timer_callback | wait
+    // IDENTIFICAÇÃO---------- | count | reload | modo      | func                | estado
+    HOURGLASS_ID__TIMER_A, /// | 5s    | ------ | one-shot  | soft_timer_callback | run
+    HOURGLASS_ID__TIMER_B, /// | 2s    | 2s     | periódico | soft_timer_callback | wait
+    HOURGLASS_ID__TIMER_C, /// | 1s    | 2,5s   | periódico | NULL                | run
+    HOURGLASS_ID__TIMER_D, /// | 0,5s  | 0,5s   | one-shot  | soft_timer_callback | wait
 
     // ...
     HOURGLASS_TOTAL_ID /// Total de timers.
@@ -66,19 +66,19 @@ typedef enum tagHOURGLASS_ID
 typedef enum tagHOURGLASS_TIMEOUT
 {
     HOURGLASS_TIMER__OFF = 0,
-    HOURGLASS_TIMER__100MS = 1*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__200MS = 2*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__300MS = 3*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__400MS = 4*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__500MS = 5*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__1S = 10*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__1S2 = 12*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__2S = 20*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__2S5 = 25*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__3S = 30*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__4S = 40*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__5S = 50*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
-    HOURGLASS_TIMER__10S = 100*HOURGLASS_MASTER_TIMER_BASE_IN_MS,
+    HOURGLASS_TIMER__100MS = 1,
+    HOURGLASS_TIMER__200MS = 2,
+    HOURGLASS_TIMER__300MS = 3,
+    HOURGLASS_TIMER__400MS = 4,
+    HOURGLASS_TIMER__500MS = 5,
+    HOURGLASS_TIMER__1S = 10,
+    HOURGLASS_TIMER__1S2 = 12,
+    HOURGLASS_TIMER__2S = 20,
+    HOURGLASS_TIMER__2S5 = 25,
+    HOURGLASS_TIMER__3S = 30,
+    HOURGLASS_TIMER__4S = 40,
+    HOURGLASS_TIMER__5S = 50,
+    HOURGLASS_TIMER__10S = 100,
 
 } HOURGLASS_TIMEOUT;
 
@@ -103,11 +103,12 @@ typedef ErrorStatus (*hourglass_callback)(HOURGLASS_ID);
 /////////////////////////////////////////////////////////////////
 // variáveis globais
 /////////////////////////////////////////////////////////////////
-
+pthread_mutex_t gMutex1; /// exemplo
 /////////////////////////////////////////////////////////////////
 // macros
 /////////////////////////////////////////////////////////////////
-
+#define DISABLE_MASTER_INTERRUPT() do{ pthread_mutex_lock( &gMutex1 ); }while(0) /// exemplo
+#define ENABLE_MASTER_INTERRUPT() do{ pthread_mutex_unlock( &gMutex1 ); }while(0) /// exemplo
 /////////////////////////////////////////////////////////////////
 // protótipo das funções públicas
 /////////////////////////////////////////////////////////////////
