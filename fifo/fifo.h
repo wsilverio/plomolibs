@@ -37,7 +37,7 @@ typedef struct tagFIFO
     uint8_t *buffer;    /// ponteiro para o array externo.
     uint8_t readIndex;  /// índice de leitura.
     uint8_t writeIndex; /// índice de escrita.
-} FIFO;
+} Fifo;
 /////////////////////////////////////////////////////////////////
 // variáveis globais
 /////////////////////////////////////////////////////////////////
@@ -61,8 +61,8 @@ typedef struct tagFIFO
 /////////////////////////////////////////////////////////////////
 // protótipo das funções públicas
 /////////////////////////////////////////////////////////////////
-uint8_t fifo_data_length(FIFO *fifo);
-bool fifo_push(FIFO *fifo, uint8_t data);
-bool fifo_pull(FIFO *fifo, uint8_t *data);
+uint8_t fifo_data_length(Fifo *fifo);
+bool fifo_push(Fifo *fifo, uint8_t data);
+bool fifo_pull(Fifo *fifo, uint8_t *data);
 
 #endif // FIFO_H

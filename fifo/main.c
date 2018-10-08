@@ -23,7 +23,7 @@
 // variáveis privadas do módulo
 /////////////////////////////////////////////////////////////////
 /// Objeto fifo
-FIFO fifo;
+Fifo fifo;
 /// Array a armazenar os dados da fifo.
 /// @note o tamanho do buffer deve ser 1 unidade maior que o tamanho da fifo.
 /// @note soma-se "1" pois os índices (escrita/leitura) nunca alcançam \a fifo.size.

@@ -50,7 +50,7 @@
  * @param fifo Fifo a ser analisada.
  * @return Quantidade de dados presentes na fifo.
  */
-uint8_t fifo_data_length(FIFO *fifo)
+uint8_t fifo_data_length(Fifo *fifo)
 {
     if (fifo->writeIndex >= fifo->readIndex)
     {
@@ -66,7 +66,7 @@ uint8_t fifo_data_length(FIFO *fifo)
  * @param data Dado a ser inserido.
  * @return "true", se sucesso. "false" caso erro.
  */
-bool fifo_push(FIFO *fifo, uint8_t data)
+bool fifo_push(Fifo *fifo, uint8_t data)
 {
     if (fifo_data_length(fifo) == (fifo->size - 1))
     {
@@ -89,7 +89,7 @@ bool fifo_push(FIFO *fifo, uint8_t data)
  * @param data Variável a armazenar o dado retirado.
 * @return "true", se sucesso. "false" caso erro.
  */
-bool fifo_pull(FIFO *fifo, uint8_t *data)
+bool fifo_pull(Fifo *fifo, uint8_t *data)
 {
     if (fifo_data_length(fifo) == 0)
     {
