@@ -43,14 +43,14 @@
  */
 struct
 {
-    HOURGLASS_TIMEOUT count; /// contador.
-    HOURGLASS_TIMEOUT reload; /// recarga do contador (se \a mode = HOURGLASS_MODE__PERIODIC).
-    HOURGLASS_MODE mode; /// modo de operação.
+    HourglassTimeout sand; /// contador.
+    HourglassTimeout reload; /// recarga do contador (se \a mode = HOURGLASS_MODE__PERIODIC).
+    HourglassMode mode; /// modo de operação.
     FunctionalState status; /// sinaliza que o timer está rodando.
     void *param; /// parâmetro a ser passado para a função de callback.
     hourglass_callback callback_func; /// função de callback.
     bool timedout; /// sinaliza que ocorreu, ao menos, um estouro.
-} mHOURGLASS[HOURGLASS_TOTAL_ID];
+} mHourglass[HOURGLASS_TOTAL_ID];
 
 /////////////////////////////////////////////////////////////////
 // variáveis globais
@@ -71,12 +71,12 @@ bool mInit = false; /// Sinaliza que o módulo foi inicializado.
  * @param id ID a ser verificado.
  */
 #define IS_VALID_ID(id) ((bool)((id) < HOURGLASS_TOTAL_ID)) // ***macro insegura***
-//#define IS_VALID_ID(id) (bool)((id) < GET_ARRAY_LENGTH(mHOURGLASS))
+//#define IS_VALID_ID(id) (bool)((id) < GET_ARRAY_LENGTH(mHourglass))
 
 /////////////////////////////////////////////////////////////////
 // protótipo das funções privadas
 /////////////////////////////////////////////////////////////////
-void hourglass_deinit(HOURGLASS_ID id);
+void hourglass_deinit(HourglassId id);
 /////////////////////////////////////////////////////////////////
 // implementação do módulo
 /////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ void hourglass_deinit(HOURGLASS_ID id);
  */
 void hourglass_init(void)
 {
-    for (HOURGLASS_ID id = (HOURGLASS_ID)0; id < HOURGLASS_TOTAL_ID; ++id)
+    for (HourglassId id = (HourglassId)0; id < HOURGLASS_TOTAL_ID; ++id)
     {
         hourglass_deinit(id);
     }
@@ -100,17 +100,17 @@ void hourglass_init(void)
  * @brief Deinicializa um determinado timer.
  * @param id Identificação.
  */
-void hourglass_deinit(HOURGLASS_ID id)
+void hourglass_deinit(HourglassId id)
 {
     assert_param(IS_VALID_ID(id));
 
-    mHOURGLASS[id].count = HOURGLASS_TIMER__OFF;
-    mHOURGLASS[id].reload = HOURGLASS_TIMER__OFF;
-    mHOURGLASS[id].mode = HOURGLASS_MODE__ONE_SHOT;
-    mHOURGLASS[id].status = DISABLE;
-    //mHOURGLASS[id].param = NULL;
-    mHOURGLASS[id].callback_func = NULL;
-    mHOURGLASS[id].timedout = false;
+    mHourglass[id].sand = HOURGLASS_TIMER__OFF;
+    mHourglass[id].reload = HOURGLASS_TIMER__OFF;
+    mHourglass[id].mode = HOURGLASS_MODE__ONE_SHOT;
+    mHourglass[id].status = DISABLE;
+    //mHourglass[id].param = NULL;
+    mHourglass[id].callback_func = NULL;
+    mHourglass[id].timedout = false;
 }
 
 /**
@@ -123,18 +123,18 @@ void hourglass_deinit(HOURGLASS_ID id)
  * @param func função de callback.
  * @param launch se deve iniciar a contagem imediatamente.
  */
-void hourglass_register_members(HOURGLASS_ID id, HOURGLASS_TIMEOUT timeout, HOURGLASS_TIMEOUT reload, HOURGLASS_MODE mode, /*void *param,*/ hourglass_callback func, FunctionalState status)
+void hourglass_register_members(HourglassId id, HourglassTimeout timeout, HourglassTimeout reload, HourglassMode mode, /*void *param,*/ hourglass_callback func, FunctionalState status)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
-    mHOURGLASS[id].count = timeout;
-    mHOURGLASS[id].reload = reload;
-    mHOURGLASS[id].mode = mode;
-    //mHOURGLASS[id].param = param;
-    mHOURGLASS[id].callback_func = func;
-    mHOURGLASS[id].timedout = false;
+    mHourglass[id].sand = timeout;
+    mHourglass[id].reload = reload;
+    mHourglass[id].mode = mode;
+    //mHourglass[id].param = param;
+    mHourglass[id].callback_func = func;
+    mHourglass[id].timedout = false;
 
-    mHOURGLASS[id].status = status;
+    mHourglass[id].status = status;
 }
 
 /**
@@ -142,12 +142,12 @@ void hourglass_register_members(HOURGLASS_ID id, HOURGLASS_TIMEOUT timeout, HOUR
  * @param id Identificação.
  * @param newStatus Novo status.
  */
-void hourglass_set_status(HOURGLASS_ID id, FunctionalState newStatus)
+void hourglass_set_status(HourglassId id, FunctionalState newStatus)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    mHOURGLASS[id].status = newStatus;
+    mHourglass[id].status = newStatus;
     ENABLE_MASTER_INTERRUPT();
 }
 
@@ -156,12 +156,12 @@ void hourglass_set_status(HOURGLASS_ID id, FunctionalState newStatus)
  * @param id Identificação.
  * @return Status atual do timer.
  */
-FunctionalState get_status(HOURGLASS_ID id)
+FunctionalState get_status(HourglassId id)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    FunctionalState copy = mHOURGLASS[id].status;
+    FunctionalState copy = mHourglass[id].status;
     ENABLE_MASTER_INTERRUPT();
 
     return copy;
@@ -171,14 +171,14 @@ FunctionalState get_status(HOURGLASS_ID id)
  * @brief Reinicia o timer.
  * @param id Identificação
  */
-void hourglass_restart(HOURGLASS_ID id)
+void hourglass_restart(HourglassId id)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    mHOURGLASS[id].count = mHOURGLASS[id].reload;
-    mHOURGLASS[id].timedout = false;
-    mHOURGLASS[id].status = ENABLE;
+    mHourglass[id].sand = mHourglass[id].reload;
+    mHourglass[id].timedout = false;
+    mHourglass[id].status = ENABLE;
     ENABLE_MASTER_INTERRUPT();
 }
 
@@ -188,14 +188,14 @@ void hourglass_restart(HOURGLASS_ID id)
  * @param newTime Novo tempo para contagem.
  * @param newStatus Novo estado do timer.
  */
-void hourglass_set_time(HOURGLASS_ID id, HOURGLASS_TIMEOUT newTime, FunctionalState newStatus)
+void hourglass_set_time(HourglassId id, HourglassTimeout newTime, FunctionalState newStatus)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    mHOURGLASS[id].count = newTime;
-    mHOURGLASS[id].timedout = false;
-    mHOURGLASS[id].status = newStatus;
+    mHourglass[id].sand = newTime;
+    mHourglass[id].timedout = false;
+    mHourglass[id].status = newStatus;
     ENABLE_MASTER_INTERRUPT();
 }
 
@@ -204,12 +204,12 @@ void hourglass_set_time(HOURGLASS_ID id, HOURGLASS_TIMEOUT newTime, FunctionalSt
  * @param id Identificação.
  * @return Valor do contador.
  */
-uint16_t hourglass_get_time(HOURGLASS_ID id)
+uint16_t hourglass_get_time(HourglassId id)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    uint16_t copy = mHOURGLASS[id].count;
+    uint16_t copy = mHourglass[id].sand;
     ENABLE_MASTER_INTERRUPT();
 
     return copy;
@@ -220,12 +220,12 @@ uint16_t hourglass_get_time(HOURGLASS_ID id)
  * @param id Identificação.
  * @param reload Valor da recarga.
  */
-void hourglass_set_reload(HOURGLASS_ID id, HOURGLASS_TIMEOUT reload)
+void hourglass_set_reload(HourglassId id, HourglassTimeout reload)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    mHOURGLASS[id].reload = reload;
+    mHourglass[id].reload = reload;
     ENABLE_MASTER_INTERRUPT();
 }
 
@@ -234,12 +234,12 @@ void hourglass_set_reload(HOURGLASS_ID id, HOURGLASS_TIMEOUT reload)
  * @param id Identificação.
  * @return Valor da recarga.
  */
-uint16_t hourglass_get_reload(HOURGLASS_ID id)
+uint16_t hourglass_get_reload(HourglassId id)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    uint16_t copy = mHOURGLASS[id].reload;
+    uint16_t copy = mHourglass[id].reload;
     ENABLE_MASTER_INTERRUPT();
 
     return copy;
@@ -250,12 +250,12 @@ uint16_t hourglass_get_reload(HOURGLASS_ID id)
  * @param id Identificação.
  * @return false, se não estourou o tempo, true caso contrário.
  */
-bool hourglass_is_timedout(HOURGLASS_ID id)
+bool hourglass_is_timedout(HourglassId id)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    bool status = mHOURGLASS[id].timedout;
+    bool status = mHourglass[id].timedout;
     ENABLE_MASTER_INTERRUPT();
 
     return status;
@@ -267,13 +267,13 @@ bool hourglass_is_timedout(HOURGLASS_ID id)
  * @param id Identificação.
  * @return false, se não estourou o tempo, true caso contrário.
  */
-bool hourglass_is_timedout_with_cleaning(HOURGLASS_ID id)
+bool hourglass_is_timedout_with_cleaning(HourglassId id)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    bool copy = mHOURGLASS[id].timedout;
-    mHOURGLASS[id].timedout = false;
+    bool copy = mHourglass[id].timedout;
+    mHourglass[id].timedout = false;
     ENABLE_MASTER_INTERRUPT();
 
     return copy;
@@ -283,12 +283,12 @@ bool hourglass_is_timedout_with_cleaning(HOURGLASS_ID id)
  * @brief Limpa manualmente a flag de estouro.
  * @param id Identificação.
  */
-void hourglass_clear_timeout_flag(HOURGLASS_ID id)
+void hourglass_clear_timeout_flag(HourglassId id)
 {
     assert_param(IS_VALID_ID(id) && mInit);
 
     DISABLE_MASTER_INTERRUPT();
-    mHOURGLASS[id].timedout = false;
+    mHourglass[id].timedout = false;
     ENABLE_MASTER_INTERRUPT();
 }
 
@@ -300,52 +300,52 @@ void hourglass_timertick(void)
     assert_param(mInit);
 
     // Percorre todo o array.
-    for (HOURGLASS_ID id = (HOURGLASS_ID)0; id < HOURGLASS_TOTAL_ID; ++id)
+    for (HourglassId id = (HourglassId)0; id < HOURGLASS_TOTAL_ID; ++id)
     {
         // Verifica se o timer está rodando.
-        if (mHOURGLASS[id].status != DISABLE)
+        if (mHourglass[id].status != DISABLE)
         {
             // Verifica se o contador está ativo.
-            if (mHOURGLASS[id].count != 0)
+            if (mHourglass[id].sand != 0)
             {
                 // Decrementa o contador;
-                --mHOURGLASS[id].count;
+                --mHourglass[id].sand;
 
                 // Verifica se o decremento gerou timeout.
-                if (mHOURGLASS[id].count == 0)
+                if (mHourglass[id].sand == 0)
                 {
                     // TIMEOUT.
                     ///////////
 
                     // Sinaliza o timeout.
-                    mHOURGLASS[id].timedout = true;
+                    mHourglass[id].timedout = true;
 
                     // Verifica se foi registrada uma função de callback.
-                    if (mHOURGLASS[id].callback_func != NULL)
+                    if (mHourglass[id].callback_func != NULL)
                     {
                         // Lança a função de callback e captura o retorno.
                         // Se a função for bem concluída, então a flag de timeout será limpa.
-                        if (mHOURGLASS[id].callback_func(id) == SUCCESS)
-                        //if (mHOURGLASS[id].callback_func(mHOURGLASS[id].param) == SUCCESS)
+                        if (mHourglass[id].callback_func(id) == SUCCESS)
+                        //if (mHourglass[id].callback_func(mHourglass[id].param) == SUCCESS)
                         {
                             // A função de callback já concluiu o trabalho.
                             ///////////////////////////////////////////////
 
                             // Limpa a flag de timeout.
-                            mHOURGLASS[id].timedout = false;
+                            mHourglass[id].timedout = false;
                         }
                     }
 
                     // Verifica se o timer é periódico.
-                    if (mHOURGLASS[id].mode == HOURGLASS_MODE__PERIODIC)
+                    if (mHourglass[id].mode == HOURGLASS_MODE__PERIODIC)
                     {
                         // Então recarrega o timer.
-                        mHOURGLASS[id].count = mHOURGLASS[id].reload;
+                        mHourglass[id].sand = mHourglass[id].reload;
                     }
                     else
                     {
                         // Senão, pára o timer.
-                        mHOURGLASS[id].status = DISABLE;
+                        mHourglass[id].status = DISABLE;
                     }
                 }
             }

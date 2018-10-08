@@ -24,7 +24,7 @@ static int thread_1_count;
 /////////////////////////////////////////////////////////////////
 // protótipo das funções privadas
 /////////////////////////////////////////////////////////////////
-ErrorStatus soft_timer_callback(HOURGLASS_ID id);
+ErrorStatus soft_timer_callback(HourglassId id);
 static void *thread_1(void *arg);
 /////////////////////////////////////////////////////////////////
 // implementação do exemplo
@@ -83,7 +83,7 @@ int main()
  * @param id Identificação.
  * @return Conclusão da execução.
  */
-ErrorStatus soft_timer_callback(HOURGLASS_ID id)
+ErrorStatus soft_timer_callback(HourglassId id)
 {
     ErrorStatus retValue = SUCCESS;
 
